@@ -1,6 +1,6 @@
 <template>
   <mu-container>
-    <mu-card style="text-align: left; margin: 0 auto;" raised>
+    <mu-card @click="jumpToDetail" style="text-align: left; margin: 0 auto;" raised>
       <div style="display: flex; margin-bottom: 8px;">
         <div style="flex: 1">
           <mu-card-header :title="item.member.nickname" :sub-title="item.created_time" style="padding-bottom: 0">
@@ -25,7 +25,10 @@
 
           </mu-card-text>
         </div>
-        <img v-if="first_image_src" class="abstract_image" :src="first_image_src" alt="帖子图片">
+        <div v-if="first_image_src" class="abstract_image">
+          <img :src="first_image_src" alt="帖子图片">
+          <mu-badge v-if="item.images.length > 1" :content="item.images.length + '图片'" class="badge-bottomright"></mu-badge>
+        </div>
       </div>
       <mu-card-actions style="text-align: right; padding-top: 0; vertical-align: center; padding-right: 16px">
         <span style="margin-right: 1em">
@@ -60,6 +63,10 @@ export default class PostCard extends Vue {
 
   get first_image_src() {
     return this.item?.images.length ? convertResUrl(this.item?.images[0]) : ""
+  }
+
+  jumpToDetail() {
+    this.$router.push(`/post/${this.item?.id}`)
   }
 }
 </script>
@@ -103,10 +110,24 @@ export default class PostCard extends Vue {
 .abstract_image {
   width: 120px;
   height: 120px;
-  object-fit: cover;
   align-self: flex-end;
   justify-self: right;
   margin-right: 16px;
   margin-top: 8px;
+  position: relative;
 }
+
+.abstract_image img {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.badge-bottomright {
+  position: absolute;
+  right: 5%;
+  bottom: 5%;
+}
+
 </style>

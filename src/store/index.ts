@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {idRangeToPageFirsts, requestPage, requestPost} from "@/utils/request";
+import {idRangeToPageFirsts, idToPageFirst, requestPage, requestPost} from "@/utils/request";
 import {filterOnePostItem} from "@/utils/filter";
 
 Vue.use(Vuex)
@@ -27,6 +27,13 @@ export default new Vuex.Store({
         },
     },
     actions: {
+        async ensurePost({state, commit}, id) {
+            let pf = idToPageFirst(id)
+            if ((state.postInfos as any)[pf] === undefined) {
+                let arr = await requestPost(pf)
+                commit('mergePostInfo', {arr, pf})
+            }
+        },
         async ensurePostOfPage({state, commit}, {page, showType}) {
             if (showType === undefined) showType = state.showType
             let pageIds = (state.pageInfos as any)[showType].pageIds
@@ -43,7 +50,7 @@ export default new Vuex.Store({
         },
         async changeShowType({state, commit, dispatch}, {type, page}) {
             if (state.showType === type) {
-                await await dispatch('jumpToPage', page)
+                console.log(await dispatch('jumpToPage', page))
                 return
             }
             if (!(state.pageInfos as any)[type]) {
@@ -54,8 +61,10 @@ export default new Vuex.Store({
             commit('modifyPage', {startPage: page, showPageCount: 1, showType: type})
         },
         async jumpToPage({state, commit, dispatch, getters}, page: number): Promise<number> {
+            console.log(page, state)
+            if (page === undefined) page = 0
             if (page < 0 || page >= getters.maxPage) return -1
-            if (page >= state.startPage && page < state.startPage + state.showPagesCount) return 0 // 目前就是可见的，只要滚动到对应位置即可
+            if (page === state.startPage) return 0 // 现在就在这页上 无需变换
             // 需要重新加载。showCount重置回1。
             await dispatch('ensurePostOfPage', {page})
             commit('modifyPage', {startPage: page, showPageCount: 1})

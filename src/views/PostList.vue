@@ -44,7 +44,7 @@ export default class PostList extends Vue {
     const DEFALUT_TYPE = 4
     const ALLOW_TYPES = [4, 14]
     let type = this.$route.query.type !== undefined? Number(this.$route.query.type): undefined
-    let page = this.$route.query.page !== undefined? Number(this.$route.query.page): undefined
+    let page = this.$route.query.page !== undefined? Number(this.$route.query.page) - 1: undefined
     if (!ALLOW_TYPES.find(value => value === type)) type = DEFALUT_TYPE // 如果并非允许的type，直接重置为默认type
     await this.$store.dispatch('changeShowType', {type, page})
   }
