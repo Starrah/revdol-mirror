@@ -7,6 +7,11 @@ module.exports = {
             "libraryName": "muse-ui",
             "libraryDirectory": "lib",
             "camel2DashComponentName": false
-        }]
+        }, "muse-ui"],
+        [
+            "import",
+            {libraryName: "ant-design-vue", libraryDirectory: "es", style: true},
+            "ant-design-vue"
+        ]
     ]
 }

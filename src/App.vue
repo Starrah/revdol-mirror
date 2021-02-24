@@ -2,6 +2,7 @@
   <div id="app">
     <MyAppBar style="margin-bottom: 1px"></MyAppBar>
     <router-view/>
+    <a-back-top />
   </div>
 </template>
 
@@ -51,6 +52,9 @@ export default class App extends Vue {
     console.log("如果希望对源码、架构等进行研究的话，没有问题，请随便研究~")
     console.log("但是注意不要使用太多的流量和发起太多的请求，不要使用脚本对数据进行二次爬取，更不要进行攻击哦~你的每一次请求数据都在花费开发者的真金白银TAT")
     console.log("如果有意见建议，或者希望参与贡献，可以到Github上提Issue，或者通过声明中的联系方式联系开发者~")
+    if (this.$route.name !== "About" && localStorage.getItem("agreement") !== "true") {
+      this.$router.replace("/about")
+    }
   }
 }
 </script>

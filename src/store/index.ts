@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {idRangeToPageFirsts, idToPageFirst, requestPage, requestPost} from "@/utils/request";
-import {filterOnePostItem} from "@/utils/filter";
+import {requestPage, requestPost} from "@/utils/request";
+import {filterOnePostItem, idRangeToPageFirsts, idToPageFirst} from "@/utils/pageUtil";
 import moment from "moment"
 
 Vue.use(Vuex)
@@ -37,6 +37,7 @@ export default new Vuex.Store({
         },
         async ensurePostOfPage({state, commit}, {page, showType}) {
             if (showType === undefined) showType = state.showType
+            if (showType < 0) return
             let pfRange
             let fullPostList = (state.pageInfos as any)[showType].fullPostList
             if (fullPostList) {
@@ -57,6 +58,7 @@ export default new Vuex.Store({
         },
         async changeShowType({state, commit, dispatch}, {type, page}) {
             if (state.showType === type) {
+                await dispatch('jumpToPage', page)
                 return
             }
             if (!(state.pageInfos as any)[type]) {

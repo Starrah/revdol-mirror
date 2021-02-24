@@ -64,6 +64,14 @@ export default class PostCard extends Vue {
   right: 5%;
   bottom: 5%;
 }
-
+@media screen and (max-width: 700px) {
+  .abstract_image {
+    width: 90px;
+  }
+  .mu-card >>> .mu-card-text {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
 
 </style>

@@ -15,7 +15,8 @@ import 'muse-ui/lib/styles/base.less';
 import { Card, Avatar, Icon, List, LoadMore, Divider, Grid, Badge, Dialog, AppBar, Menu, Button, Checkbox, Radio, TextField, Picker, Snackbar } from 'muse-ui';
 import 'muse-ui/lib/styles/theme.less';
 import './assets/material-icons.css';
-[Card, Avatar, Icon, List, LoadMore, Divider, Grid, Badge, Dialog, AppBar, Menu, Button, Checkbox, Radio, TextField, Picker, Snackbar].forEach(value => Vue.use(value))
+import { BackTop } from 'ant-design-vue'
+[Card, Avatar, Icon, List, LoadMore, Divider, Grid, Badge, Dialog, AppBar, Menu, Button, Checkbox, Radio, TextField, Picker, Snackbar, BackTop].forEach(value => Vue.use(value))
 // @ts-ignore
 import Toast from 'muse-ui-toast';
 // @ts-ignore

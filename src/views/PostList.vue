@@ -45,6 +45,8 @@ export default class PostList extends Vue {
     let page = this.$route.query.page !== undefined? Number(this.$route.query.page) - 1: undefined
     if (!ALLOW_TYPES.find(value => value === type)) type = DEFALUT_TYPE // 如果并非允许的type，直接重置为默认type
     await this.$store.dispatch('changeShowType', {type, page})
+    if (type !== undefined) localStorage.setItem("lastType", String(type)); else localStorage.removeItem("lastType")
+    if (page !== undefined) localStorage.setItem("lastPage", String(page + 1)); else localStorage.removeItem("lastPage")
   }
 
   async created() {
@@ -58,5 +60,11 @@ export default class PostList extends Vue {
   width: 100%;
   max-width: 700px;
 }
+@media screen and (max-width: 700px){
+  .container {
+    padding: 0;
+  }
+}
+
 
 </style>

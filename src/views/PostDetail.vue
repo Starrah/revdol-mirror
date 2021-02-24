@@ -5,7 +5,7 @@
         <AvatarNameHeader :item="item"></AvatarNameHeader>
         <PostContent :item="item"></PostContent>
 
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 16px; margin: 24px">
+        <div style="display: grid; grid-gap: 16px; margin: 24px" class="imageThumbtails">
           <div v-for="rawUrl in (item.images)" :key="rawUrl" class="square-image" @click="clickPreview(rawUrl)">
             <img :src="convertResUrl(rawUrl)" alt="帖子图片">
           </div>
@@ -18,11 +18,7 @@
       <CommentCard v-for="(comment, index) in reversedList" :key="comment.id" :floor_number="index + 1"
                    :item="comment"></CommentCard>
     </mu-container>
-    <mu-dialog :open.sync="onPreview" max-width="70%" :padding="48" scrollable lock-scroll>
-      <div>
-        <img :src="previewUrl" alt="图片" style="width: 100%; height: 100%; object-fit: contain"/>
-      </div>
-    </mu-dialog>
+    <ImagePreview :open.sync="onPreview" :image-url="previewUrl"></ImagePreview>
   </div>
 </template>
 
@@ -30,15 +26,16 @@
 import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import {PostItem} from "@/utils/PostItem";
 import {convertResUrl} from "@/utils/request";
-import {getDefaultItem} from "@/utils/filter";
+import {getDefaultItem} from "@/utils/pageUtil";
 import AvatarNameHeader from "@/components/AvatarNameHeader.vue";
 import PostContent from "@/components/PostContent.vue";
 import PraiseComment from "@/components/PraiseComment.vue";
 import CommentCard from "@/components/CommentCard.vue";
 import * as _ from "lodash";
+import ImagePreview from "@/components/ImagePreview.vue";
 
 @Component({
-  components: {CommentCard, PraiseComment, PostContent, AvatarNameHeader}
+  components: {ImagePreview, CommentCard, PraiseComment, PostContent, AvatarNameHeader}
 })
 export default class PostDetail extends Vue {
   item: PostItem = (getDefaultItem() as any)
@@ -92,5 +89,16 @@ export default class PostDetail extends Vue {
 .container-width-control {
   width: 100%;
   max-width: 700px;
+}
+.imageThumbtails {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media screen and (max-width: 700px){
+  .container {
+    padding: 0;
+  }
+  .imageThumbtails {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 </style>
