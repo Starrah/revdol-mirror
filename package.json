@@ -11,7 +11,9 @@
     "core-js": "^3.6.5",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
+    "moment": "^2.29.1",
     "muse-ui": "^3.0.2",
+    "muse-ui-toast": "^0.3.0",
     "vue": "^2.6.11",
     "vue-axios": "^3.2.4",
     "vue-class-component": "^7.2.3",
@@ -22,6 +24,7 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/lodash": "^4.14.168",
+    "@types/moment": "^2.13.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",

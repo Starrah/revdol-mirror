@@ -1,51 +1,27 @@
 <template>
   <div>
-    <mu-container>
+    <mu-container class="container-width-control">
       <mu-card style="text-align: left; margin: 0 auto;" raised>
-        <mu-card-header :title="item.member.nickname" :sub-title="item.created_time" style="padding-bottom: 0">
-          <template v-slot:avatar>
-            <mu-avatar class="avatar-overlap">
-              <img :src="headimg_src" alt="头像" class="headimg"/>
-              <img v-if="head_frame_src" :src="head_frame_src" alt="" class="head_frame"/>
-            </mu-avatar>
-          </template>
-        </mu-card-header>
-        <!--      <mu-card-media title="Image Title" sub-title="Image Sub Title">-->
-        <!--        <img src="../../assets/images/sun.jpg">-->
-        <!--      </mu-card-media>-->
-        <!--      <mu-card-title :title="item.title"></mu-card-title>-->
-        <mu-card-text style="padding-bottom: 0; padding-top: 8px; display: grid">
-          <b class="title" style="grid-area: 1/1/2/2">
-            {{ item.title }}
-          </b>
-          <div class="content" style="grid-area: 2/1/3/2">
-            {{ item.content }}
-          </div>
-        </mu-card-text>
+        <AvatarNameHeader :item="item"></AvatarNameHeader>
+        <PostContent :item="item"></PostContent>
 
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 16px; margin: 24px">
           <div v-for="rawUrl in (item.images)" :key="rawUrl" class="square-image" @click="clickPreview(rawUrl)">
             <img :src="convertResUrl(rawUrl)" alt="帖子图片">
           </div>
         </div>
-
         <mu-card-actions style="text-align: right; padding-top: 0; vertical-align: center; padding-right: 16px">
-        <span style="margin-right: 1em">
-          <mu-icon value="thumb_up" size="14"></mu-icon>
-          {{ item.praise_counts }}
-        </span>
-          <span>
-          <mu-icon value="chat" size="14"></mu-icon>
-          {{ item.comments_counts }}
-        </span>
+          <PraiseComment :item="item"></PraiseComment>
         </mu-card-actions>
       </mu-card>
+      <mu-divider/>
+      <CommentCard v-for="(comment, index) in reversedList" :key="comment.id" :floor_number="index + 1"
+                   :item="comment"></CommentCard>
     </mu-container>
-    <mu-dialog :open.sync="onPreview" max-width="70%" padding="48" scrollable lock-scroll>
-      <div >
-        <img :src="previewUrl" alt="图片" style="width: 100%; height: 100%; object-fit: contain" />
+    <mu-dialog :open.sync="onPreview" max-width="70%" :padding="48" scrollable lock-scroll>
+      <div>
+        <img :src="previewUrl" alt="图片" style="width: 100%; height: 100%; object-fit: contain"/>
       </div>
-
     </mu-dialog>
   </div>
 </template>
@@ -55,8 +31,15 @@ import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import {PostItem} from "@/utils/PostItem";
 import {convertResUrl} from "@/utils/request";
 import {getDefaultItem} from "@/utils/filter";
+import AvatarNameHeader from "@/components/AvatarNameHeader.vue";
+import PostContent from "@/components/PostContent.vue";
+import PraiseComment from "@/components/PraiseComment.vue";
+import CommentCard from "@/components/CommentCard.vue";
+import * as _ from "lodash";
 
-@Component
+@Component({
+  components: {CommentCard, PraiseComment, PostContent, AvatarNameHeader}
+})
 export default class PostDetail extends Vue {
   item: PostItem = (getDefaultItem() as any)
   onPreview = false
@@ -65,14 +48,6 @@ export default class PostDetail extends Vue {
   clickPreview(rawUrl?: string) {
     this.previewUrl = convertResUrl(rawUrl)
     this.onPreview = true
-  }
-
-  get headimg_src() {
-    return convertResUrl(this.item?.member?.headimg)
-  }
-
-  get head_frame_src() {
-    return convertResUrl(this.item?.member?.head_frame)
   }
 
   convertResUrl(url?: string) {
@@ -87,6 +62,10 @@ export default class PostDetail extends Vue {
     this.item = item ? item : getDefaultItem()
   }
 
+  get reversedList() {
+    return _.reverse(this.item?.comments || [])
+  }
+
   async created() {
     await this.changeItem()
   }
@@ -94,50 +73,6 @@ export default class PostDetail extends Vue {
 </script>
 
 <style scoped>
-.title {
-  font-size: large;
-}
-
-.content {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.avatar-overlap img {
-  position: absolute;
-}
-
-.headimg {
-  height: 100%;
-  width: 100%;
-  top: 0;
-  left: 0;
-}
-
-.head_frame {
-  height: 130%;
-  width: 130%;
-  top: -15%;
-  left: -15%;
-  border-radius: 0;
-}
-
-.avatar-overlap {
-  position: relative;
-}
-
-.abstract_image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  align-self: flex-end;
-  justify-self: right;
-  margin-right: 16px;
-  margin-top: 8px;
-}
 
 .square-image {
   position: relative;
@@ -152,5 +87,10 @@ export default class PostDetail extends Vue {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.container-width-control {
+  width: 100%;
+  max-width: 700px;
 }
 </style>

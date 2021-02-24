@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {idRangeToPageFirsts, idToPageFirst, requestPage, requestPost} from "@/utils/request";
 import {filterOnePostItem} from "@/utils/filter";
+import moment from "moment"
 
 Vue.use(Vuex)
 
@@ -36,11 +37,17 @@ export default new Vuex.Store({
         },
         async ensurePostOfPage({state, commit}, {page, showType}) {
             if (showType === undefined) showType = state.showType
-            let pageIds = (state.pageInfos as any)[showType].pageIds
-            let last = pageIds[page]
-            let first = (page + 1 < pageIds.length ? pageIds[page + 1] : 0) + 1
-            let pfRange = idRangeToPageFirsts(first, last)
-            console.log(first, last, pfRange)
+            let pfRange
+            let fullPostList = (state.pageInfos as any)[showType].fullPostList
+            if (fullPostList) {
+                let postIds: Array<number> = fullPostList[page]
+                pfRange = postIds.map(value => idToPageFirst(value))
+            }else {
+                let pageIds = (state.pageInfos as any)[showType].pageIds
+                let last = pageIds[page]
+                let first = (page + 1 < pageIds.length ? pageIds[page + 1] : 0) + 1
+                pfRange = idRangeToPageFirsts(first, last)
+            }
             for (let pf of pfRange) {
                 if ((state.postInfos as any)[pf] === undefined) {
                     let arr = await requestPost(pf)
@@ -50,7 +57,6 @@ export default new Vuex.Store({
         },
         async changeShowType({state, commit, dispatch}, {type, page}) {
             if (state.showType === type) {
-                console.log(await dispatch('jumpToPage', page))
                 return
             }
             if (!(state.pageInfos as any)[type]) {
@@ -61,7 +67,6 @@ export default new Vuex.Store({
             commit('modifyPage', {startPage: page, showPageCount: 1, showType: type})
         },
         async jumpToPage({state, commit, dispatch, getters}, page: number): Promise<number> {
-            console.log(page, state)
             if (page === undefined) page = 0
             if (page < 0 || page >= getters.maxPage) return -1
             if (page === state.startPage) return 0 // 现在就在这页上 无需变换
@@ -71,11 +76,25 @@ export default new Vuex.Store({
             return 1 // 页面整个发生置换
         },
         async loadOneMorePage({state, commit, dispatch, getters}) {
-            console.log((state.pageInfos as any)[state.showType].pageIds.length)
             if (getters.loadedAll) return
             let newPage = state.startPage + state.showPagesCount
             await dispatch('ensurePostOfPage', {page: newPage})
             commit('modifyPage', {showPageCount: state.showPagesCount + 1})
+        },
+        getDateFromPage({state, dispatch}, date: Date): string | number {
+            let dateNumber = Number(moment(date).format("YYMMDD"))
+            let pageDates = (state.pageInfos as any)[state.showType].pageDates
+            if (!pageDates) return "程序发生错误或暂不支持此功能"
+            let page
+            for (page=0; page<pageDates.length;page++) {
+                if (Number(pageDates[page]) === dateNumber) break
+                else if (Number(pageDates[page]) < dateNumber) {
+                    if (page > 0)page--
+                    break
+                }
+            }
+            if (!(page >= 0 && page < pageDates.length)) return "日期无效"
+            return page
         }
     },
     modules: {},
