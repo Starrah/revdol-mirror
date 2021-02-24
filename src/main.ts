@@ -8,7 +8,8 @@ import VueAxios from 'vue-axios'
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
 
-axios.defaults.baseURL = "http://localhost:8033"
+// 配置开发时的请求URL。部署后和页面所在的host就是一致的了，就不需要配置了。
+if (location.href.indexOf("localhost") !== -1) axios.defaults.baseURL = "http://localhost:8033"
 
 import 'muse-ui/lib/styles/base.less';
 import { Card, Avatar, Icon, List, LoadMore, Divider, Grid, Badge, Dialog, AppBar, Menu, Button, Checkbox, Radio, TextField, Picker, Snackbar } from 'muse-ui';

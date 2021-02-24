@@ -1,19 +1,9 @@
-# revdol-mirror
+战斗吧歌姬小程序镜像站——前端源码
+=================================================
 
-## Project setup
-```
-npm install
-```
+## 关于本项目
+请在[这里](./src/views/About.vue)，点进去之后进行阅读。
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## 意见建议/联系开发者
+直接发Issue，或者发邮件到starrah@foxmail.com
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
