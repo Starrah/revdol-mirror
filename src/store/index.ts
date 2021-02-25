@@ -49,17 +49,21 @@ export default new Vuex.Store({
                 let first = (page + 1 < pageIds.length ? pageIds[page + 1] : 0) + 1
                 pfRange = idRangeToPageFirsts(first, last)
             }
+            let pendingRequests = []
             for (let pf of pfRange) {
                 if ((state.postInfos as any)[pf] === undefined) {
-                    let arr = await requestPost(pf)
-                    commit('mergePostInfo', {arr, pf})
+                    pendingRequests.push({req: requestPost(pf), pf})
                 }
             }
+            for (let pendingRequest of pendingRequests) {
+                let arr = await pendingRequest.req
+                let pf = pendingRequest.pf
+                commit('mergePostInfo', {arr, pf})
+            }
         },
-        async changeShowType({state, commit, dispatch}, {type, page}) {
+        async changeShowType({state, commit, dispatch}, {type, page}): Promise<number> {
             if (state.showType === type) {
-                await dispatch('jumpToPage', page)
-                return
+                return await dispatch('jumpToPage', page)
             }
             if (!(state.pageInfos as any)[type]) {
                 (state.pageInfos as any)[type] = await requestPage(type)
@@ -67,6 +71,7 @@ export default new Vuex.Store({
             if (page === undefined || page < 0 || page >= (state.pageInfos as any)[type].pageIds.length) page = 0
             await dispatch('ensurePostOfPage', {page, showType: type})
             commit('modifyPage', {startPage: page, showPageCount: 1, showType: type})
+            return 1
         },
         async jumpToPage({state, commit, dispatch, getters}, page: number): Promise<number> {
             if (page === undefined) page = 0
