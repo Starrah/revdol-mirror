@@ -24,7 +24,8 @@ import Toast from 'muse-ui-toast';
   Picker, Snackbar, Helpers, Progress, BackTop, Toast].forEach(value => Vue.use(value))
 
 export const DEFALUT_TYPE = 4 // 默认的showType（贝拉）
-export const ALLOW_TYPES = [4, 14, 24] // 允许的所有showType（贝拉一组的三个：普通、二创、歌姬）
+export let ALLOW_TYPES = [0, 1, 2, 3, 4, 5, 6] // 允许的所有showType（贝拉一组的三个：普通、二创、歌姬）
+ALLOW_TYPES = ALLOW_TYPES.concat(ALLOW_TYPES.map(v=>v+10), ALLOW_TYPES.map(v=>v+20))
 
 new Vue({
   router,

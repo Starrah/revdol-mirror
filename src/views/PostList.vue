@@ -17,6 +17,7 @@ import {Component, Vue, Watch} from "vue-property-decorator";
 import PostCard from "@/components/PostCard.vue";
 import {ALLOW_TYPES, DEFALUT_TYPE} from "@/main";
 import delay from "delay";
+import {idol_english_names} from "@/utils/pageUtil";
 
 @Component({
   components: {PostCard}
@@ -44,10 +45,21 @@ export default class PostList extends Vue {
   // globalloading = false
 
   @Watch('$route') async changeTypeAndPageAccordingToQuery() {
-    let type = this.$route.query.type !== undefined? Number(this.$route.query.type): undefined
+    // 根据idol字符串参数和query中type数值综合确定实际的type
+    let typeFromNumber = this.$route.query.type !== undefined? Number(this.$route.query.type): undefined
+    let typeFromString = idol_english_names.indexOf(this.$route.params.idol) !== -1? idol_english_names.indexOf(this.$route.params.idol): undefined
+    if (typeFromNumber === undefined) typeFromNumber = typeFromString
+    if (typeFromNumber !== undefined && typeFromString !== undefined && typeFromNumber % 10 !== typeFromString) {
+      // 名称和type数值不匹配，强制清空query
+      console.error("名称和type数值不匹配，强制清空query")
+      this.$router.push({query: {}})
+    }
+    let type = typeFromNumber
+    console.log(type)
     let page = this.$route.query.page !== undefined? Number(this.$route.query.page) - 1: undefined
-    if (!ALLOW_TYPES.find(value => value === type)) type = DEFALUT_TYPE // 如果并非允许的type，直接重置为默认type
+    if (type === undefined || ALLOW_TYPES.indexOf(type) === -1) type = DEFALUT_TYPE // 如果并非允许的type，直接重置为默认type
     let toastId
+    console.log({type, page})
     try {
       // this.globalloading = true TODO 为什么加载组件用不了？
       // 替代方案：Promise.race，若超过一定时间未完成加载就弹出Toast提示

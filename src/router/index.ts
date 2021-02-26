@@ -26,6 +26,11 @@ const routes: Array<RouteConfig> = [
     name: 'About',
     component: About
   },
+  {
+    path: '/:idol(all|katya|rose|qingge|isabella|tamamo|moxi)',
+    name: 'PostList',
+    component: PostList
+  },
 ]
 
 const router = new VueRouter({

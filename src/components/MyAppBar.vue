@@ -10,12 +10,15 @@
       </mu-button>
     </div>
 
-    <div class="showOnlyMobile" :class="mobileTitleCssClass">
+    <div v-if="!showIdolTitleIndex" class="showOnlyMobile mobileTitle" :class="showIconButtons?'mobileTitleShort':''">
       战斗吧歌姬<br v-if="showIconButtons">小程序镜像站
+    </div>
+    <div v-else class="showOnlyMobile mobileTitle">
+      {{idol_names[showIdolTitleIndex]}}
     </div>
 
     <div v-if="showIconButtons" slot="right" style="display: flex">
-      <div class="mu-appbar-title showOnlyPC">{{ idol_name[$store.state.showType % 10] }}</div>
+      <div class="mu-appbar-title showOnlyPC">{{ idol_names[$store.state.showType % 10] }}</div>
       <mu-menu style="align-self: center" placement="bottom-end" :open.sync="menuOpen0">
         <mu-button icon>
           <mu-icon value="auto_stories" size="32"></mu-icon>
@@ -49,19 +52,11 @@
           <mu-icon value="settings" size="32"></mu-icon>
         </mu-button>
         <mu-list slot="content">
-          <mu-list-item button @click="onChangeForumMainType(4)">
+          <mu-list-item button v-for="i in sections" :key="i" @click="onChangeForumMainType(i)">
             <mu-list-item-content>
-              <mu-list-item-title>贝拉</mu-list-item-title>
+              <mu-list-item-title>{{i? idol_names[i]: "全部"}}</mu-list-item-title>
             </mu-list-item-content>
           </mu-list-item>
-          <!--          <mu-list-item button>-->
-          <!--            <mu-list-item-action>-->
-          <!--              <mu-checkbox v-model="erchuangOnly"></mu-checkbox>-->
-          <!--            </mu-list-item-action>-->
-          <!--            <mu-list-item-title>-->
-          <!--              只看二创-->
-          <!--            </mu-list-item-title>-->
-          <!--          </mu-list-item>-->
           <mu-list-item>
             <mu-radio :value="0" :input-value="radioValue" @change="onChangeRadio" label="全部帖子"></mu-radio>
           </mu-list-item>
@@ -82,10 +77,17 @@
 
 <script lang="ts">
 import {Component, Vue, Watch} from "vue-property-decorator";
+import {idol_english_names, idol_names} from "@/utils/pageUtil";
+import {ALLOW_TYPES} from "@/main";
 
 @Component
 export default class MyAppBar extends Vue {
-  idol_name = ["", "卡缇娅", "罗兹", "清歌", "贝拉", "玉藻", "墨汐"]
+  idol_names = idol_names
+  sections = ALLOW_TYPES.filter(v=>v<10)
+
+  get sectionAppBarTitle() {
+    return idol_names[this.$store.state.showType % 10]
+  }
 
   get showIconButtons() {
     return this.$route.matched[0].name === 'PostList'
@@ -106,8 +108,9 @@ export default class MyAppBar extends Vue {
     this.inputPageValue = this.$store.state.startPage + 1
   }
 
-  get mobileTitleCssClass() {
-    return this.showIconButtons ? "mobileTitle" : "mobileTitleLong"
+  get showIdolTitleIndex() { // 副标题或手机端标题显示的偶像名字的id。如果不需要显示偶像名字，则返回0
+    return this.$store.state.showType % 10
+    // return Math.max(idol_english_names.indexOf(this.$route.params.idol), 0)
   }
 
   get totalPageCount() {
@@ -124,7 +127,10 @@ export default class MyAppBar extends Vue {
   }
 
   changeType(newType: number) {
-    if (this.$store.state.showType !== newType) this.$router.push(`/?type=${newType}`)
+    let idol = idol_english_names[newType % 10]
+    let queryStr = newType >= 10 ? `?type=${newType}` : ""
+    console.log(`/${idol}${queryStr}`)
+    if (this.$store.state.showType !== newType) this.$router.push(`/${idol}${queryStr}`)
   }
 
   onChangeForumMainType(newType: number) {
@@ -189,11 +195,6 @@ export default class MyAppBar extends Vue {
 
   .mobileTitle {
     display: flex;
-    align-items: center;
-    font-size: 16px;
-    line-height: 20px;
-    padding-left: 0;
-    padding-right: 0;
   }
 
   .mobileTitle >>> .mu-button-wrapper {
@@ -204,8 +205,12 @@ export default class MyAppBar extends Vue {
     display: none !important;
   }
 
-  .mobileTitleLong {
-    display: flex;
+  .mobileTitleShort {
+    align-items: center;
+    font-size: 16px;
+    line-height: 20px;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
