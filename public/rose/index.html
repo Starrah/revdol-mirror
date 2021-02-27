@@ -7,9 +7,11 @@
 <body>
 <!--    重定向-->
     <script>
-        let lastSlash = location.pathname.replace("/index.html", "").lastIndexOf("/")
+        let str = location.pathname.replace("/index.html", "")
+        if (str.substr(str.length - 1) === "/") str = str.substr(0, str.length - 1)
+        let lastSlash = str.lastIndexOf("/")
         let idol_name = ""
-        if (lastSlash !== -1) idol_name = location.pathname.substring(lastSlash + 1)
+        if (lastSlash !== -1) idol_name = str.substring(lastSlash + 1)
         location.href = `/#/${idol_name}`
     </script>
 </body>
