@@ -114,7 +114,7 @@ export default class MyAppBar extends Vue {
   }
 
   get totalPageCount() {
-    return this.$store.state.showType > 0 ? this.$store.state.pageInfos[this.$store.state.showType].pageIds.length : 0
+    return this.$store.state.showType >= 0 ? this.$store.state.pageInfos[this.$store.state.showType].pageIds.length : 0
   }
 
   get action_icon() {
